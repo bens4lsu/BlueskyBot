@@ -1,0 +1,19 @@
+
+{
+    "database" : {
+        "hostname"  : "localhost",
+        "port"      : 3306,
+        "username"  : "myuser",
+        "password"  : "password",
+        "database"  : "bluesky_bot",
+        "certificateVerificationString" : "none"
+    },
+    
+    "logLevel" : "debug",
+    
+    "bluesky" : {
+        "host" : "bsky.social",
+        "identifier" : "bens4lsu",
+        "password" : "ThousandBucksATicket"
+    }
+}

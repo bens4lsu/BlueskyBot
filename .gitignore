@@ -1,4 +1,4 @@
-Packages
+'Packages
 .build
 xcuserdata
 *.xcodeproj
@@ -10,3 +10,4 @@ db.sqlite
 .env.*
 ! .env.example
 .vscode
+Resources/Config.json
