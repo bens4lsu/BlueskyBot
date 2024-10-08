@@ -8,6 +8,20 @@
 import Foundation
 
 struct DailyPhoto: Codable {
+    
+    static let defaultDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM dd, yyyy"
+        formatter.timeZone = .init(identifier: "UTC")
+        return formatter
+    }()
+    
+    static let yyyyMMddDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = .init(identifier: "UTC")
+        return formatter
+    }()
 
     let caption: String
     let month: UInt8
@@ -22,12 +36,11 @@ struct DailyPhoto: Codable {
         "/dailyphotostore/\(year)/\(year)\(month.zeroPadded(2))\(day.zeroPadded(2)).jpg"
     }
     
-//    var dateString: String {
-//        let yyyyMMdd = "\(year.zeroPadded(4))-\(month.zeroPadded(2))-\(day.zeroPadded(2))"
-//        let date = EnvironmentKey.yyyyMMddDateFormatter.date(from: yyyyMMdd) ?? Date()
-//        let str = EnvironmentKey.defaultDateFormatter.string(from: date)
-//        return str
-//    }
+    var dateString: String {
+        let date = Self.yyyyMMddDateFormatter.date(from: "\(year.zeroPadded(4))-\(month.zeroPadded(2))-\(day.zeroPadded(2))") ?? Date()
+        let str = Self.defaultDateFormatter.string(from: date)
+        return str
+    }
     
 }
 

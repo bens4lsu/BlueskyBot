@@ -18,11 +18,11 @@ struct BlueskyPostJob: AsyncScheduledJob {
     func run(context: Queues.QueueContext) async throws {
         context.logger.debug("Starting BlueskyPostJob.run()")
         let dp = DailyPhotoData().randomItem
-        print(dp)
         let settings = ConfigurationSettings()
         let auth = BlueskyAuthentication(host: settings.bluesky.host)
         let credentials = try await auth?.logIn(identifier: settings.bluesky.identifier, password: settings.bluesky.password)
         let client = auth?.getAuthenticatedClient(credentials: credentials!)
-        try await client?.createPost(text: "😀")
+        let text = "\(dp.caption)"
+        try await client?.createPost(text: text, link: dp.link, dateString: dp.dateString, image: dp.imagePath, imageSize: 999)
     }
 }

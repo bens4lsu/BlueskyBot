@@ -20,9 +20,89 @@ struct CreateRecordData: Encodable {
     let record: PostData
 }
 
-struct PostData: Encodable {
+    
+struct ImageEmbed: Encodable {
+        
+    struct ImageRef: Encodable {
+        let link: String
+    }
+    
+    struct ImageInner: Encodable {
+        let type = "blob"
+        let ref: ImageRef
+        let mimeType = "image/webp"
+        let size: Int
+    }
+    
+    struct ImageOuter: Encodable {
+        let alt: String
+        let image: ImageInner
+    }
+    
+    struct Images: Encodable {
+        let images: [ImageOuter]
+    }
+
+    let type = "app.bsky.embed.images"
+    let embed: Images
+    
+}
+
+struct LinkEmbed {
+    
+    struct Link: Encodable {
+        let description: String
+        let title: String
+        let uri: String
+    }
+    
+    let type = "app.bsky.embed.external"
+    let external: Link
+    
+    init(description: String, title: String, uri: String) {
+        self.external = Link(description: description, title: title, uri: uri)
+    }
+}
+
+extension LinkEmbed: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case external
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
+        try container.encode(external, forKey: .external)
+    }
+}
+
+// MARK: PostData
+
+struct PostData {
     let text: String
     let createdAt: Date
+    let embed: Encodable
+}
+
+extension PostData: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case text
+        case createdAt
+        case embed
+        //case imageEmbed
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(text, forKey: .text)
+        try container.encode(createdAt, forKey: .createdAt)
+
+        if embed is LinkEmbed {
+            let tmpEmbed = embed as! LinkEmbed
+            try container.encode(tmpEmbed, forKey: .embed)
+        }
+    }
 }
 
 public struct Credentials: Decodable {
@@ -126,8 +206,14 @@ public class BlueskyClient: BlueskyAPIClient {
         super.init(host: host)
     }
 
-    public func createPost(text: String) async throws {
-        let post = PostData(text: text, createdAt: Date())
+    public func createPost(text: String, link: String, dateString: String, image: String, imageSize: Int) async throws {
+        let linkEmbed = LinkEmbed(description: "", title: "Picture of the Day from \(dateString)", uri: link)
+
+        let post = PostData(text: text, createdAt: Date(), embed: linkEmbed)
+        let encoder = JSONEncoder()
+        let json = try encoder.encode(post)
+        let jsonString = String(data: json, encoding: .utf8)
+        print (jsonString ?? "nil")
         let record = CreateRecordData(
             repo: credentials.did,
             collection: "app.bsky.feed.post",
