@@ -8,6 +8,7 @@
 
 
 import Foundation
+import Logging
 
 struct LoginData: Encodable {
     let identifier: String
@@ -140,7 +141,7 @@ public class BlueskyAPIClient {
     }()
 
     let jsonDecoder = JSONDecoder()
-
+    
     public init?(host: String) {
         guard let baseURL = URL(string: "https://\(host)/xrpc") else { return nil }
 
@@ -156,6 +157,15 @@ public class BlueskyAPIClient {
         request.httpMethod = "POST"
         request.httpBody = encodedData
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        return request
+    }
+    
+    func postBlob(method: String, data: Data) -> URLRequest {
+        let url = baseURL.appendingPathComponent(method)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = data
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         return request
     }
 
@@ -205,14 +215,27 @@ public class BlueskyClient: BlueskyAPIClient {
 
         super.init(host: host)
     }
+    
+    private func postImage(data: Data) async throws -> Data {
+        var request = super.postBlob(method: "com.atproto.repo.uploadBlob", data: data)
+        request.setValue("Bearer \(credentials.accessJwt)", forHTTPHeaderField: "Authorization")
+        return try await send(request)
+    }
 
-    public func createPost(text: String, link: String, dateString: String, image: String, imageSize: Int) async throws {
+    public func createPost(text: String, link: String, dateString: String, imageFilePath: String) async throws {
+
+        let imageData = try Data(contentsOf: URL(filePath: "Public/" + imageFilePath))
+        let postImageData = try await postImage(data: imageData)
+        
+        print(String(data: postImageData, encoding: .utf8)!)
+        
         let linkEmbed = LinkEmbed(description: "", title: "Picture of the Day from \(dateString)", uri: link)
 
         let post = PostData(text: text, createdAt: Date(), embed: linkEmbed)
-        let encoder = JSONEncoder()
-        let json = try encoder.encode(post)
+
+        let json = try jsonEncoder.encode(post)
         let jsonString = String(data: json, encoding: .utf8)
+
         print (jsonString ?? "nil")
         let record = CreateRecordData(
             repo: credentials.did,
@@ -223,6 +246,8 @@ public class BlueskyClient: BlueskyAPIClient {
         let request = postRequest(method: "com.atproto.repo.createRecord", data: record)
         let _ = try await send(request)
     }
+    
+    
 
     override func postRequest(method: String, data: Encodable) -> URLRequest {
         var request = super.postRequest(method: method, data: data)

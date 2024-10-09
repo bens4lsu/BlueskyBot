@@ -23,6 +23,6 @@ struct BlueskyPostJob: AsyncScheduledJob {
         let credentials = try await auth?.logIn(identifier: settings.bluesky.identifier, password: settings.bluesky.password)
         let client = auth?.getAuthenticatedClient(credentials: credentials!)
         let text = "\(dp.caption)"
-        try await client?.createPost(text: text, link: dp.link, dateString: dp.dateString, image: dp.imagePath, imageSize: 999)
+        try await client?.createPost(text: text, link: dp.link, dateString: dp.dateString, imageFilePath: dp.imagePath)
     }
 }
