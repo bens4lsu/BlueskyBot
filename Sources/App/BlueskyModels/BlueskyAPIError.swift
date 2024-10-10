@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if os(Linux)
+import FoundationNetworking
+#endif
 
 public enum BlueskyAPIError: LocalizedError, CustomStringConvertible {
     case invalidCode(response: HTTPURLResponse)
