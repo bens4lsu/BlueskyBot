@@ -13,7 +13,7 @@ public class BlueskyAuthentication: BlueskyAPIClient {
     typealias LoginData = BlueskyAccount.LoginData
 
     public func getAuthenticatedClient(credentials: Credentials) -> BlueskyClient {
-        return BlueskyClient(host: host, credentials: credentials)!
+        return BlueskyClient(host: host, credentials: credentials, logLevel: logLevel)!
     }
 
     public func logIn(identifier: String, password: String) async throws -> Credentials {

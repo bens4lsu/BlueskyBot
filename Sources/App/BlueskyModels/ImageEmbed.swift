@@ -11,13 +11,24 @@ struct ImageEmbed: Encodable {
         
     struct ImageRef: Encodable {
         let link: String
+        
+        enum CodingKeys: String, CodingKey {
+            case link = "$link"
+        }
     }
     
     struct ImageInner: Encodable {
         let type = "blob"
         let ref: ImageRef
-        let mimeType = "image/webp"
+        let mimeType = "image/jpeg"
         let size: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case type = "$type"
+            case ref
+            case mimeType
+            case size
+        }
     }
     
     struct ImageOuter: Encodable {
@@ -33,6 +44,11 @@ struct ImageEmbed: Encodable {
         let inner = ImageInner(ref: ref, size: size)
         let outer = ImageOuter(alt: alt, image: inner)
         self.images = [outer]
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case images
     }
     
 }

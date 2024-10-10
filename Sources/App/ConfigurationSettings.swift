@@ -27,7 +27,7 @@ class ConfigurationSettings: Decodable {
     }
     
     let database: ConfigurationSettings.Database
-    let logLevel: String
+    private let logLevel: String
     let bluesky: Bluesky
     
     

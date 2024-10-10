@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Logging
 
 public class BlueskyClient: BlueskyAPIClient {
     
@@ -15,10 +16,17 @@ public class BlueskyClient: BlueskyAPIClient {
     
     public var credentials: Credentials
     
-    public init?(host: String, credentials: Credentials) {
+    let logger = {
+        var tmpLogger = Logger(label: "bluesky.client.logger")
+        tmpLogger.logLevel = .debug
+        return tmpLogger
+    }()
+        
+    
+    public init?(host: String, credentials: Credentials, logLevel: Logger.Level) {
         self.credentials = credentials
         
-        super.init(host: host)
+        super.init(host: host, logLevel: logLevel)
     }
     
     
@@ -30,6 +38,15 @@ public class BlueskyClient: BlueskyAPIClient {
         let decoded = try jsonDecoder.decode(UploadBlobResponse.self, from: response)
         return decoded
     }
+    
+    private func debugJson(data: Encodable) throws {
+        let json = try jsonEncoder.encode(data)
+        let jsonString = String(data: json, encoding: .utf8)
+        logger.debug("\(credentials)")
+        logger.debug("\(jsonString ?? "nil")")
+    }
+    
+    
     
     override func postRequest(method: String, data: Encodable) -> URLRequest {
         var request = super.postRequest(method: method, data: data)
@@ -52,15 +69,13 @@ public class BlueskyClient: BlueskyAPIClient {
                 
         let post = PostData(text: text, embed: imageEmbed, link: linkEmbed)
         
-        let json = try jsonEncoder.encode(post)
-        let jsonString = String(data: json, encoding: .utf8)
-        
-        print (jsonString ?? "nil")
         let record = CreateRecordData(
             repo: credentials.did,
             collection: "app.bsky.feed.post",
             record: post
         )
+        
+        try debugJson(data: record)
         
         let request = postRequest(method: "com.atproto.repo.createRecord", data: record)
         let _ = try await send(request)

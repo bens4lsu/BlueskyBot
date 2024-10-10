@@ -19,7 +19,7 @@ struct BlueskyPostJob: AsyncScheduledJob {
         context.logger.debug("Starting BlueskyPostJob.run()")
         let dp = DailyPhotoData().randomItem
         let settings = ConfigurationSettings()
-        let auth = BlueskyAuthentication(host: settings.bluesky.host)
+        let auth = BlueskyAuthentication(host: settings.bluesky.host, logLevel: settings.loggerLogLevel)
         let credentials = try await auth?.logIn(identifier: settings.bluesky.identifier, password: settings.bluesky.password)
         let client = auth?.getAuthenticatedClient(credentials: credentials!)
         let text = "\(dp.caption)"

@@ -24,12 +24,12 @@ public struct BlueskyRecordData {
         let text: String
         let createdAt = Date()
         let embed: ImageEmbed
-        let record: Record
+        //let record: Record
         
         init(text: String, embed: ImageEmbed, link: LinkEmbed) {
             self.text = text
             self.embed = embed
-            self.record = Record(facets: [link])
+            //self.record = Record(facets: [link])
         }
     }
 }

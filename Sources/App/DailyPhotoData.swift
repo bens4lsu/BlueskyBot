@@ -18,14 +18,14 @@ struct DailyPhotoData {
     
     private static let dailyphotostore = "/Volumes/BenPortData/theskinny-media/dailyphotostore"
     
-    static let collection: [DailyPhoto] = {
+    var collection: [DailyPhoto] {
         
         var items = [DailyPhoto]()
-        let rootPath = dailyphotostore
+        let rootPath = Self.dailyphotostore
         do {
             let topFolder = try Folder(path: rootPath)
             try topFolder.subfolders.forEach { folder in
-                guard let year = UInt16(folder.name) else {
+                guard let _ = UInt16(folder.name) else {
                     throw DailyPhotoError.errorInFolderName(name: folder.name)
                 }
                 try folder.files.forEach { file in
@@ -54,9 +54,9 @@ struct DailyPhotoData {
             print ("Error loading daily photots: \(e)")
         }
         return items
-    }()
+    }
     
     var randomItem: DailyPhoto {
-        Self.collection.randomElement()!
+        collection.randomElement()!
     }
 }

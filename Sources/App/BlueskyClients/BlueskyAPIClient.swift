@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Logging
 
 public class BlueskyAPIClient {
     public let host: String
@@ -18,12 +19,14 @@ public class BlueskyAPIClient {
     }()
 
     let jsonDecoder = JSONDecoder()
+    let logLevel: Logger.Level
     
-    public init?(host: String) {
+    public init?(host: String, logLevel: Logger.Level) {
         guard let baseURL = URL(string: "https://\(host)/xrpc") else { return nil }
 
         self.host = host
         self.baseURL = baseURL
+        self.logLevel = logLevel
     }
 
     func postRequest(method: String, data: Encodable) -> URLRequest {
