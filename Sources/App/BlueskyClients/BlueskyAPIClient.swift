@@ -7,6 +7,9 @@
 
 import Foundation
 import Logging
+#if os(Linux)
+import FoundationNetworking
+#endif
 
 public class BlueskyAPIClient {
     public let host: String
