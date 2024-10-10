@@ -16,20 +16,16 @@ public struct BlueskyRecordData {
     }
     
     public struct PostData: Encodable {
-        
-        struct Record: Encodable {
-            let facets: [LinkEmbed]
-        }
 
         let text: String
         let createdAt = Date()
         let embed: ImageEmbed
-        //let record: Record
+        let facets: [LinkEmbed]
         
         init(text: String, embed: ImageEmbed, link: LinkEmbed) {
             self.text = text
             self.embed = embed
-            //self.record = Record(facets: [link])
+            self.facets = [link]
         }
     }
 }

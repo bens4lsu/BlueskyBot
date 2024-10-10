@@ -49,4 +49,11 @@ public struct UploadBlobResponse: Decodable {
     
     public var size: Int { blob.size }
     
+    static var testResponse:Self {
+        let inner = UploadBlobResponse.Inner(link: "987654321abc")
+        let outer = UploadBlobResponse.Outer(type: "test", ref: inner, mimeType: "xxx", size: 999)
+        return UploadBlobResponse(blob: outer)
+        
+    }
+    
 }

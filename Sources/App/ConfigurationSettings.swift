@@ -30,7 +30,6 @@ class ConfigurationSettings: Decodable {
     private let logLevel: String
     let bluesky: Bluesky
     
-    
     var certificateVerification: CertificateVerification {
         if database.certificateVerificationString == "noHostnameVerification" {
             return .noHostnameVerification

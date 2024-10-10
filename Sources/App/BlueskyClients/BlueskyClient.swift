@@ -39,14 +39,13 @@ public class BlueskyClient: BlueskyAPIClient {
         return decoded
     }
     
+    
     private func debugJson(data: Encodable) throws {
         let json = try jsonEncoder.encode(data)
         let jsonString = String(data: json, encoding: .utf8)
         logger.debug("\(credentials)")
         logger.debug("\(jsonString ?? "nil")")
     }
-    
-    
     
     override func postRequest(method: String, data: Encodable) -> URLRequest {
         var request = super.postRequest(method: method, data: data)
@@ -67,7 +66,7 @@ public class BlueskyClient: BlueskyAPIClient {
         
         let linkEmbed = LinkEmbed(uri: link, byteStart: bytes1, byteEnd: bytes2)
                 
-        let post = PostData(text: text, embed: imageEmbed, link: linkEmbed)
+        let post = PostData(text: fullPostText, embed: imageEmbed, link: linkEmbed)
         
         let record = CreateRecordData(
             repo: credentials.did,

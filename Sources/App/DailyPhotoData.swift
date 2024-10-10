@@ -7,16 +7,26 @@
 
 import Foundation
 import Files
+import Logging
 
 enum DailyPhotoError: Error {
     case errorInFileName(name: String)
     case errorInFolderName(name: String)
     case fileOutOfPlace(_ text: String)
+    case noFileFound(forDay: String)
+    case suspectedHtmlInCaption(forDay: String)
 }
 
 struct DailyPhotoData {
     
     private static let dailyphotostore = "/Volumes/BenPortData/theskinny-media/dailyphotostore"
+    
+    var logger: Logger {
+        let settings = ConfigurationSettings()
+        var tmpLogger = Logger(label: "dailyphotodata")
+        tmpLogger.logLevel = settings.loggerLogLevel
+        return tmpLogger
+    }
     
     var collection: [DailyPhoto] {
         
@@ -57,6 +67,24 @@ struct DailyPhotoData {
     }
     
     var randomItem: DailyPhoto {
-        collection.randomElement()!
+        get throws {
+            var onePhoto = collection.randomElement()!
+            while (try onePhoto.hasLinkInCaption) {
+                logger.warning("Can not post photo from \(onePhoto.dateString), as it may contain html or a markdown link.")
+                onePhoto = collection.randomElement()!
+            }
+            return onePhoto
+        }
+    }
+        
+    func specificItem(year: UInt16, month: UInt8, day:UInt8 ) throws -> DailyPhoto {
+        let onePhoto = collection.filter { $0.year == year && $0.month == month && $0.day == day }.first
+        guard let onePhoto else {
+            throw DailyPhotoError.noFileFound(forDay: "\(year)-\(month)-\(day)")
+        }
+        if try onePhoto.hasLinkInCaption {
+            throw DailyPhotoError.suspectedHtmlInCaption(forDay: "\(year)-\(month)-\(day)")
+        }
+        return onePhoto
     }
 }

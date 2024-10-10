@@ -17,7 +17,8 @@ struct BlueskyPostJob: AsyncScheduledJob {
     
     func run(context: Queues.QueueContext) async throws {
         context.logger.debug("Starting BlueskyPostJob.run()")
-        let dp = DailyPhotoData().randomItem
+        let dp = try DailyPhotoData().randomItem
+        //let dp = try DailyPhotoData().specificItem(year: 2017, month: 02, day: 08)
         let settings = ConfigurationSettings()
         let auth = BlueskyAuthentication(host: settings.bluesky.host, logLevel: settings.loggerLogLevel)
         let credentials = try await auth?.logIn(identifier: settings.bluesky.identifier, password: settings.bluesky.password)

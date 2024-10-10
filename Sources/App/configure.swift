@@ -28,6 +28,6 @@ public func configure(_ app: Application) async throws {
     
     let postJob = BlueskyPostJob()
     
-    app.queues.schedule(postJob).minutely().at(5)
+    app.queues.schedule(postJob).daily().at(13, 31)
     try app.queues.startScheduledJobs()
 }

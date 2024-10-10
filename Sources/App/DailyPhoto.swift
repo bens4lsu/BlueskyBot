@@ -42,6 +42,14 @@ struct DailyPhoto: Codable {
         return str
     }
     
+    var hasLinkInCaption: Bool {
+        get throws {
+            let htmlTest = self.caption.contains("<")
+            let markdownTest = self.caption.contains(#"(?:__|[*#])|\[(.*?)\]\(.*?\)"#)
+            return htmlTest || markdownTest
+        }
+    }
+    
 }
 
 
