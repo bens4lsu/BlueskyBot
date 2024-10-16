@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Vapor
 
 public struct BlueskyAccount {
     
@@ -14,7 +15,7 @@ public struct BlueskyAccount {
         let password: String
     }
 
-    public struct Credentials: Decodable {
+    public struct Credentials: Encodable {
         let did: String
         let handle: String
         let accessJwt: String

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Vapor
 
 /*
  {"blob":
@@ -19,7 +20,7 @@ import Foundation
 
 public struct UploadBlobResponse: Decodable {
     
-    public struct Inner: Decodable {
+    public struct Inner: Content {
         let link: String
 
         enum CodingKeys: String, CodingKey {

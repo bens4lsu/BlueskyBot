@@ -6,14 +6,36 @@
 //
 
 import Foundation
-import Logging
-#if os(Linux)
-import FoundationNetworking
-#endif
+import Vapor
+import Queues
+
+extension Data: @retroactive AsyncResponseEncodable { }
+extension Data: @retroactive AsyncRequestDecodable { }
+extension Data: @retroactive ResponseEncodable { }
+extension Data: @retroactive RequestDecodable { }
+extension Data: @retroactive Content { }
+public protocol Encodable: Content { }
+
+//extension Data: @retroactive ContentContainer {
+//    
+//    public mutating func encode<E>(_ encodable: E, using encoder: any Vapor.ContentEncoder) throws where E : Encodable {
+//        
+//    }
+//    
+//    public func decode<D>(_: D.Type, using decoder: any Vapor.ContentDecoder) throws -> D where D : Decodable {
+//        self as! D
+//    }
+//    
+//    public var contentType: Vapor.HTTPMediaType? {
+//        nil
+//    }
+//}
+
 
 public class BlueskyAPIClient {
+    
     public let host: String
-    public let baseURL: URL
+    public let baseURL: String
 
     let jsonEncoder = {
         let encoder = JSONEncoder()
@@ -22,47 +44,80 @@ public class BlueskyAPIClient {
     }()
 
     let jsonDecoder = JSONDecoder()
-    let logLevel: Logger.Level
+    let logger: Logger
+    let loginData: BlueskyAccount.LoginData
+    let client: any Client
+    let context: QueueContext
+        
+    public init(_ context: QueueContext) {
+        let settings = ConfigurationSettings()
+        
+        self.host = settings.bluesky.host
+        self.baseURL = "https://\(host)/xrpc/"
+        self.client = context.application.client
+        self.context = context
+        
+        
+        var logger = Logger(label: "bluesky.api.client")
+        logger.logLevel = settings.loggerLogLevel
+        self.logger = logger
+        
+        self.loginData = .init(identifier: settings.bluesky.identifier, password: settings.bluesky.password)
+    }
     
-    public init?(host: String, logLevel: Logger.Level) {
-        guard let baseURL = URL(string: "https://\(host)/xrpc") else { return nil }
-
-        self.host = host
-        self.baseURL = baseURL
-        self.logLevel = logLevel
+    private func authHeader(credentials: BlueskyAuthentication.Credentials) -> (String, String) {
+        ("Authorization", "Bearer \(credentials.accessJwt)")
     }
 
-    func postRequest(method: String, data: Encodable) -> URLRequest {
-        let url = baseURL.appendingPathComponent(method)
-        let encodedData = try! jsonEncoder.encode(data)
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.httpBody = encodedData
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        return request
-    }
-    
-    func postBlob(method: String, data: Data) -> URLRequest {
-        let url = baseURL.appendingPathComponent(method)
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.httpBody = data
-        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-        return request
-    }
-
-    func send(_ request: URLRequest) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        if let httpResponse = response as? HTTPURLResponse {
-            if httpResponse.statusCode / 100 == 2 {
-                return data
-            } else {
-                throw BlueskyAPIError.invalidCode(response: httpResponse)
-            }
-        } else {
-            throw BlueskyAPIError.invalidResponse(response: response)
+    private func postRequest(method: String, data: Data, type: HTTPMediaType, additionalHeaders: (String, String)...) async throws -> ClientResponse {
+        
+        let urlString = baseURL + method
+        let url = URI(string: urlString)
+        
+        var headers: HTTPHeaders = [:]
+        headers.add(name: "Content-Type", value: type.serialize())
+        logger.debug("\(type.serialize())")
+        for h in additionalHeaders {
+            headers.add(name: h.0, value: h.1)
         }
+        
+        let body = ByteBuffer(data: data)
+        
+        let response = try await client.send(.POST, headers: headers, to: url) { req in
+            req.body = body
+        }
+        
+        // check for error
+        if response.status.code >= 400 {
+            logger.debug ("status code from postRequest = \(response.status.code)")
+            let decoded = try response.content.decode(BlueskyErrorResponse.self)
+            let error = BlueskyAPIError.errorResponseReceived(response: decoded)
+            throw Abort(response.status, reason: error.description)
+        }
+        
+        return response
+        
+    }
+    
+    func postJpeg(method: String, data: Data, credentials: BlueskyAccount.Credentials) async throws -> ClientResponse {
+        let additionalHeader = authHeader(credentials: credentials)
+        let response = try await postRequest(method: method
+                                             , data: data
+                                             , type: .binary
+                                             , additionalHeaders: additionalHeader)
+        return response
+    }
+    
+    func postJson(method: String, data: any Encodable, credentials: BlueskyAccount.Credentials? = nil) async throws -> ClientResponse {
+        let encoded = try jsonEncoder.encode(data)
+        if credentials == nil {
+            return try await postRequest(method: method, data: encoded, type: .json)
+        }
+        let additionalHeader = authHeader(credentials: credentials!)
+        return try await postRequest(method: method
+                                     , data: encoded
+                                     , type: .json
+                                     , additionalHeaders: additionalHeader)
     }
 }
+

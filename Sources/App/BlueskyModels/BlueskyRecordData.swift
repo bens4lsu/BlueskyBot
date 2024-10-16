@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Vapor
 
 public struct BlueskyRecordData {
 
@@ -18,14 +19,15 @@ public struct BlueskyRecordData {
     public struct PostData: Encodable {
 
         let text: String
-        let createdAt = Date()
+        let createdAt: Date
         let embed: ImageEmbed
         let facets: [LinkEmbed]
-        
+    
         init(text: String, embed: ImageEmbed, link: LinkEmbed) {
             self.text = text
             self.embed = embed
             self.facets = [link]
+            self.createdAt = Date()
         }
     }
 }
