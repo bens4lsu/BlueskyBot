@@ -9,29 +9,6 @@ import Foundation
 import Vapor
 import Queues
 
-extension Data: @retroactive AsyncResponseEncodable { }
-extension Data: @retroactive AsyncRequestDecodable { }
-extension Data: @retroactive ResponseEncodable { }
-extension Data: @retroactive RequestDecodable { }
-extension Data: @retroactive Content { }
-public protocol Encodable: Content { }
-
-//extension Data: @retroactive ContentContainer {
-//    
-//    public mutating func encode<E>(_ encodable: E, using encoder: any Vapor.ContentEncoder) throws where E : Encodable {
-//        
-//    }
-//    
-//    public func decode<D>(_: D.Type, using decoder: any Vapor.ContentDecoder) throws -> D where D : Decodable {
-//        self as! D
-//    }
-//    
-//    public var contentType: Vapor.HTTPMediaType? {
-//        nil
-//    }
-//}
-
-
 public class BlueskyAPIClient {
     
     public let host: String

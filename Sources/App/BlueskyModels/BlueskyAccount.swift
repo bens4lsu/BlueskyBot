@@ -15,7 +15,7 @@ public struct BlueskyAccount {
         let password: String
     }
 
-    public struct Credentials: Encodable {
+    public struct Credentials: Decodable {
         let did: String
         let handle: String
         let accessJwt: String
