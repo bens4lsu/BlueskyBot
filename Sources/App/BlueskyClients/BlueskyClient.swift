@@ -32,7 +32,7 @@ public class BlueskyClient: BlueskyAPIClient {
     public func createPost(text: String, link: String, dateString: String, imageFilePath: String) async throws {
         logger.info("Creating post for image on \(dateString)")
         
-        let url = URL(filePath: "Public/" + imageFilePath)
+        let url = URL(fileURLWithPath: "Public/" + imageFilePath)
         let imageData = try Data(contentsOf: url)
         logger.debug("image size: \(imageData)")
         let postImageData = try await postImage(data: imageData)
