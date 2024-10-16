@@ -68,8 +68,7 @@ public class BlueskyAPIClient {
         if response.status.code >= 400 {
             logger.debug ("status code from postRequest = \(response.status.code)")
             let decoded = try response.content.decode(BlueskyErrorResponse.self)
-            let error = BlueskyAPIError.errorResponseReceived(response: decoded)
-            throw Abort(response.status, reason: error.description)
+            throw Abort(response.status, reason: "\(decoded.description)")
         }
         
         return response
