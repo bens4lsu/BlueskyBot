@@ -8,6 +8,7 @@
 import Foundation
 import Files
 import Logging
+import Vapor
 
 enum DailyPhotoError: Error {
     case errorInFileName(name: String)
@@ -19,7 +20,7 @@ enum DailyPhotoError: Error {
 
 struct DailyPhotoData {
     
-    private static let dailyphotostore = "/Volumes/BenPortData/theskinny-media/dailyphotostore"
+    private static let dailyphotostore = DirectoryConfiguration.detect().publicDirectory.appending("dailyphotostore")
     
     var logger: Logger {
         let settings = ConfigurationSettings()
