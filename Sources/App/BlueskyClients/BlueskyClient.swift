@@ -9,6 +9,7 @@ import Foundation
 import Vapor
 import Queues
 import NIOSSL
+import SwiftGD
 
 public class BlueskyClient: BlueskyAPIClient {
     
@@ -29,23 +30,21 @@ public class BlueskyClient: BlueskyAPIClient {
         return decoded
     }
     
-    public func createPost(text: String, link: String, dateString: String, imageFilePath: String) async throws {
-        logger.info("Creating post for image on \(dateString)")
+    public func createPost(dp: DailyPhoto) async throws {
+        var dp = dp
+        logger.info("Creating post for image on \(dp.dateString)")
         
-        let url = URL(fileURLWithPath: "Public/" + imageFilePath)
-        let imageData = try Data(contentsOf: url)
-        logger.debug("image size: \(imageData)")
-        let postImageData = try await postImage(data: imageData)
+        let postImageData = try await postImage(data: dp.data())
 
         let imageEmbed = ImageEmbed(link: postImageData.link, size: postImageData.size, alt: "")
         logger.debug("\(imageEmbed)")
         
-        let fullPostText1 = "\(text)\n\nOriginally posted "
+        let fullPostText1 = "\(dp.caption)\n\nOriginally posted "
         let bytes1 = fullPostText1.count
-        let fullPostText = fullPostText1 + dateString + " on theskinnyonbenny.com"
+        let fullPostText = fullPostText1 + dp.dateString + " on theskinnyonbenny.com"
         let bytes2 = fullPostText.count
         
-        let linkEmbed = LinkEmbed(uri: link, byteStart: bytes1, byteEnd: bytes2)
+        let linkEmbed = LinkEmbed(uri: dp.link, byteStart: bytes1, byteEnd: bytes2)
                 
         let post = PostData(text: fullPostText, embed: imageEmbed, link: linkEmbed)
 

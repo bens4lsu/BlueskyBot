@@ -15,6 +15,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/fluent-mysql-driver.git", from: "4.0.0"),
         .package(url: "https://github.com/m-barthelemy/vapor-queues-fluent-driver.git", from: "3.0.0-beta1"),
+        .package(url: "https://github.com/twostraws/SwiftGD.git", from: "2.0.0"),
         
     ],
     targets: [
@@ -28,6 +29,7 @@ let package = Package(
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentMySQLDriver", package: "fluent-mysql-driver"),
                 .product(name: "QueuesFluentDriver", package: "vapor-queues-fluent-driver"),
+                .product(name: "SwiftGD", package: "SwiftGD"),
 
             ],
             swiftSettings: swiftSettings
