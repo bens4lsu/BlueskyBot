@@ -18,9 +18,11 @@ enum DailyPhotoError: Error {
     case suspectedHtmlInCaption(forDay: String)
 }
 
-struct DailyPhotoData {
+class DailyPhotoData {
     
     private static let dailyphotostore = DirectoryConfiguration.detect().publicDirectory.appending("dailyphotostore")
+    
+    var alreadyPosted = TrackAlreadyPosted()
     
     var logger: Logger {
         let settings = ConfigurationSettings()
@@ -64,7 +66,10 @@ struct DailyPhotoData {
         } catch (let e) {
             print ("Error loading daily photots: \(e)")
         }
-        return items
+        
+        return items.filter {
+            !alreadyPosted.isARepeat($0.dateString)
+        }
     }
     
     var randomItem: DailyPhoto {
@@ -74,6 +79,7 @@ struct DailyPhotoData {
                 logger.warning("Can not post photo from \(onePhoto.dateString), as it may contain html or a markdown link.")
                 onePhoto = collection.randomElement()!
             }
+            try alreadyPosted.add(onePhoto.dateString)
             return onePhoto
         }
     }
