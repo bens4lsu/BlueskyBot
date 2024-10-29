@@ -9,7 +9,6 @@ import Foundation
 import Vapor
 import Queues
 import NIOSSL
-import SwiftGD
 
 public class BlueskyClient: BlueskyAPIClient {
     

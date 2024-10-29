@@ -24,25 +24,10 @@ enum Entrypoint {
             try? await app.asyncShutdown()
             throw error
         }
-        
-        try test1()
-        
+    
         try await app.execute()
         try await app.asyncShutdown()
     }
-    
-    
-    static func test1() throws {
-        let collection = DailyPhotoData().collection.filter { $0.year == 2024 }
-        for var dp in collection {
-            let numColors = try dp.colorsPerPixelsSampled()
-            let determination = numColors <= 25000 ? "screen shot" : "photo"
-            print ("\(dp.dateString): \(numColors)  => \(determination)")
-        }
-        
-    }
-    
-    
     
 }
 

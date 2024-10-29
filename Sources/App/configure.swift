@@ -35,4 +35,6 @@ public func configure(_ app: Application) async throws {
     #endif
     try app.queues.startScheduledJobs()
     
+    let _ = TrackAlreadyPosted()  // so will fail on startup if this json load fails
+    
 }

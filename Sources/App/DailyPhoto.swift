@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftGD
 import Vapor
 
 public struct DailyPhoto: Codable, Sendable {
@@ -56,7 +55,7 @@ public struct DailyPhoto: Codable, Sendable {
         }
     }
     
-
+    
     
     var colorSampleDivideByX: Int { 1 }
     var colorSampleDivideByY:Int { 1 }
@@ -79,51 +78,53 @@ public struct DailyPhoto: Codable, Sendable {
         return _data!
     }
     
-    mutating func numColors() throws -> Int {
-        if _numColors == nil {
-            let image = try Image(data: data())
-            var colors = Set<Color>()
-            // sample top right corner and count number of colors in the pixels.
-            let xSampleStart = image.size.width * ((colorSampleDivideByX - 1) / colorSampleDivideByX)
-            
-            var pixelsSampled = 0
-            for x in xSampleStart..<(image.size.width) {
-                for y in 1..<(image.size.height / colorSampleDivideByY) {
-                    let point = Point(x: x, y: y)
-                    let color = image.get(pixel: point)
-                    colors.insert(color)
-                    pixelsSampled += 1
-                }
-            }
-            _numColors = colors.count
-            _numPixelsSampled = pixelsSampled
-        }
-        return _numColors ?? 0
-    }
+}
     
-    mutating func colorsPerPixelsSampled() throws -> Float {
-        let colors = try numColors()
-        let denominator = _numPixelsSampled == 0 || _numPixelsSampled == nil ? Int.max : _numPixelsSampled!
-        return Float(colors) / Float(denominator)
-    }
-}
-
-extension Color: @retroactive Equatable {
-    public static func == (lhs: Color, rhs: Color) -> Bool {
-        Decimal(lhs.alphaComponent) == Decimal(rhs.alphaComponent)
-        && Decimal(rhs.blueComponent) == Decimal(lhs.blueComponent)
-        && Decimal(rhs.greenComponent) == Decimal(lhs.greenComponent)
-        && Decimal(rhs.redComponent) == Decimal(lhs.redComponent)
-    }
-}
-
-extension Color: @retroactive Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(Decimal(self.alphaComponent) + 2 * Decimal(self.blueComponent) + 4 * Decimal(self.greenComponent) + 8 * Decimal(self.redComponent))
-    }
-     
-    
-}
+//    mutating func numColors() throws -> Int {
+//        if _numColors == nil {
+//            let image = try Image(data: data())
+//            var colors = Set<Color>()
+//            // sample top right corner and count number of colors in the pixels.
+//            let xSampleStart = image.size.width * ((colorSampleDivideByX - 1) / colorSampleDivideByX)
+//            
+//            var pixelsSampled = 0
+//            for x in xSampleStart..<(image.size.width) {
+//                for y in 1..<(image.size.height / colorSampleDivideByY) {
+//                    let point = Point(x: x, y: y)
+//                    let color = image.get(pixel: point)
+//                    colors.insert(color)
+//                    pixelsSampled += 1
+//                }
+//            }
+//            _numColors = colors.count
+//            _numPixelsSampled = pixelsSampled
+//        }
+//        return _numColors ?? 0
+//    }
+//    
+//    mutating func colorsPerPixelsSampled() throws -> Float {
+//        let colors = try numColors()
+//        let denominator = _numPixelsSampled == 0 || _numPixelsSampled == nil ? Int.max : _numPixelsSampled!
+//        return Float(colors) / Float(denominator)
+//    }
+//}
+//
+//extension Color: @retroactive Equatable {
+//    public static func == (lhs: Color, rhs: Color) -> Bool {
+//        Decimal(lhs.alphaComponent) == Decimal(rhs.alphaComponent)
+//        && Decimal(rhs.blueComponent) == Decimal(lhs.blueComponent)
+//        && Decimal(rhs.greenComponent) == Decimal(lhs.greenComponent)
+//        && Decimal(rhs.redComponent) == Decimal(lhs.redComponent)
+//    }
+//}
+//
+//extension Color: @retroactive Hashable {
+//    public func hash(into hasher: inout Hasher) {
+//        hasher.combine(Decimal(self.alphaComponent) + 2 * Decimal(self.blueComponent) + 4 * Decimal(self.greenComponent) + 8 * Decimal(self.redComponent))
+//    }
+//     
+//    
+//}
 
 
 
