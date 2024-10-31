@@ -38,14 +38,21 @@ public class BlueskyClient: BlueskyAPIClient {
         let imageEmbed = ImageEmbed(link: postImageData.link, size: postImageData.size, alt: "")
         logger.debug("\(imageEmbed)")
         
-        let fullPostText1 = "\(dp.caption)\n\nOriginally posted "
+        var linkEmbeds = [LinkEmbed]()
+        let (postText, linkEmbed1) = try LinkEmbed.convertMarkup(dp.caption)
+        if let linkEmbed1 {
+            linkEmbeds.append(linkEmbed1)
+        }
+        
+        let fullPostText1 = "\(postText)\n\nOriginally posted "
         let bytes1 = fullPostText1.count
         let fullPostText = fullPostText1 + dp.dateString + " on theskinnyonbenny.com"
         let bytes2 = fullPostText.count
         
-        let linkEmbed = LinkEmbed(uri: dp.link, byteStart: bytes1, byteEnd: bytes2)
+        let linkEmbed2 = LinkEmbed(uri: dp.link, byteStart: bytes1, byteEnd: bytes2)
+        linkEmbeds.append(linkEmbed2)
                 
-        let post = PostData(text: fullPostText, embed: imageEmbed, link: linkEmbed)
+        let post = PostData(text: fullPostText, embed: imageEmbed, link: linkEmbeds)
 
         let record = CreateRecordData(
             repo: credentials.did,

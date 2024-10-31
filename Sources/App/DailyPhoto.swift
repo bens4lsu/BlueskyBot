@@ -53,9 +53,7 @@ public class DailyPhoto: Codable {
     
     var hasLinkInCaption: Bool {
         get throws {
-            let htmlTest = self.caption.contains("<")
-            let markdownTest = self.caption.contains(#"(?:__|[*#])|\[(.*?)\]\(.*?\)"#)
-            return htmlTest || markdownTest
+            self.caption.contains("<")
         }
     }
     

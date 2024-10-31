@@ -23,10 +23,10 @@ public struct BlueskyRecordData {
         let embed: ImageEmbed
         let facets: [LinkEmbed]
     
-        init(text: String, embed: ImageEmbed, link: LinkEmbed) {
+        init(text: String, embed: ImageEmbed, link: [LinkEmbed]) {
             self.text = text
             self.embed = embed
-            self.facets = [link]
+            self.facets = link
             self.createdAt = Date()
         }
     }
