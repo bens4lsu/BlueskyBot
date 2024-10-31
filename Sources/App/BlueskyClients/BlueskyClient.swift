@@ -30,7 +30,7 @@ public class BlueskyClient: BlueskyAPIClient {
     }
     
     public func createPost(dp: DailyPhoto) async throws {
-        var dp = dp
+        let dp = dp
         logger.info("Creating post for image on \(dp.dateString)")
         
         let postImageData = try await postImage(data: dp.data())

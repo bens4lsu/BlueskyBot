@@ -68,7 +68,7 @@ class DailyPhotoData {
         }
         
         return items.filter {
-            !alreadyPosted.isARepeat($0.dateString)
+            !alreadyPosted.isARepeat($0.eightCharacterID)
         }
     }
     
@@ -79,7 +79,7 @@ class DailyPhotoData {
                 logger.warning("Can not post photo from \(onePhoto.dateString), as it may contain html or a markdown link.")
                 onePhoto = collection.randomElement()!
             }
-            try alreadyPosted.add(onePhoto.dateString)
+            try alreadyPosted.add(onePhoto.eightCharacterID)
             return onePhoto
         }
     }

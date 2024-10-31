@@ -8,7 +8,7 @@
 import Foundation
 import Vapor
 
-public struct DailyPhoto: Codable, Sendable {
+public class DailyPhoto: Codable {
     
     static let defaultDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -47,6 +47,10 @@ public struct DailyPhoto: Codable, Sendable {
         return str
     }
     
+    var eightCharacterID: String {
+        "\(year.zeroPadded(4))\(month.zeroPadded(2))\(day.zeroPadded(2))"
+    }
+    
     var hasLinkInCaption: Bool {
         get throws {
             let htmlTest = self.caption.contains("<")
@@ -67,7 +71,7 @@ public struct DailyPhoto: Codable, Sendable {
         self.year = year
     }
     
-    mutating func data() throws -> Data {
+    func data() throws -> Data {
         if _data == nil {
             let url = URL(fileURLWithPath: "Public/" + imagePath)
             _data = try Data(contentsOf: url)
