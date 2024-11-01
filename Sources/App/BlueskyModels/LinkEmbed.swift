@@ -45,7 +45,12 @@ struct LinkEmbed: Encodable {
 
 extension LinkEmbed {
     
-    static func convertMarkup(_ string: String) throws -> (String, LinkEmbed?) {
+    static func convertMarkdown(_ string: String) throws -> (String, LinkEmbed?) {
+        return try convertMarkdownLink(string)
+
+    }
+    
+    private static func convertMarkdownLink(_ string: String) throws -> (String, LinkEmbed?) {
         let pattern = #"\[(.*?)\]\((.*?)\)"#
         let regex = try NSRegularExpression(pattern: pattern, options: [])
         let wholeRange = NSRange(location: 0, length: string.count)
@@ -71,6 +76,5 @@ extension LinkEmbed {
             
         }
         return (string, nil)
-
     }
 }

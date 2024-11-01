@@ -29,14 +29,15 @@ public func configure(_ app: Application) async throws {
     let postJob = BlueskyPostJob()
     
     #if DEBUG
-    //app.queues.schedule(postJob).minutely().at(5)
+    app.queues.schedule(postJob).minutely().at(5)
     #else
     app.queues.schedule(postJob).daily().at(13, 31)
     #endif
     try app.queues.startScheduledJobs()
     
-    let _ = TrackAlreadyPosted()  // so will fail on startup if this json load fails
-    
+    // load these at startup, so that if it's going to fail, it fails right away
+    let _ = TrackAlreadyPosted()
+    let _ = DailyPhotoData().collection
     
     
     

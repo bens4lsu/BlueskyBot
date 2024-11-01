@@ -39,7 +39,7 @@ public class BlueskyClient: BlueskyAPIClient {
         logger.debug("\(imageEmbed)")
         
         var linkEmbeds = [LinkEmbed]()
-        let (postText, linkEmbed1) = try LinkEmbed.convertMarkup(dp.caption)
+        let (postText, linkEmbed1) = try LinkEmbed.convertMarkdown(dp.caption)
         if let linkEmbed1 {
             linkEmbeds.append(linkEmbed1)
         }
