@@ -29,6 +29,7 @@ class ConfigurationSettings: Decodable {
     let database: ConfigurationSettings.Database
     private let logLevel: String
     let bluesky: Bluesky
+    let postOneOnStartup: Bool
     
     var certificateVerification: CertificateVerification {
         if database.certificateVerificationString == "noHostnameVerification" {
@@ -53,6 +54,7 @@ class ConfigurationSettings: Decodable {
             self.database = decoder.database
             self.logLevel = decoder.logLevel
             self.bluesky = decoder.bluesky
+            self.postOneOnStartup = decoder.postOneOnStartup
         }
         catch {
             print ("Could not initialize app from Config.json. \n \(error)")

@@ -39,6 +39,10 @@ public func configure(_ app: Application) async throws {
     let _ = TrackAlreadyPosted()
     let _ = DailyPhotoData().collection
     
+    if settings.postOneOnStartup {
+        try await BlueskyPostJob().run(context: app.queues.queue.context)
+    }
+    
     
     
 }
